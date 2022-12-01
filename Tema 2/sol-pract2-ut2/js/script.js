@@ -1,5 +1,3 @@
-
-
 const verificarCampoNombre= (e)=>{
     let nombre = e.target.value;
     if (!validarCampoNombre(nombre)){

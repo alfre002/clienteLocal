@@ -15,7 +15,7 @@ const campoNombre = d.querySelector(".nombreApellidos")
 // funcion validar nombre
 const validarNombre = (nombre) => {
     // expresion regular
-    const exp = new RegExp(/[ a-zA-Z]/)
+    const exp = new RegExp(/^[ a-zA-Z]+$/)
     if(!exp.test(nombre)) {
         return false
     } else {
@@ -25,15 +25,9 @@ const validarNombre = (nombre) => {
 
 // funcion error nombre
 const errorNombre = (nombre) => {
-    if(!validarNombre(nombre)) {
+    if(!validarNombre(nombre.value)) {
         // creo mensaje de error y lo meto debajo del div de nombre
-        const divNombre = d.querySelector(".divNombre")
-        const error = d.createElement("label")
-        error.textContent = "Nombre incorrecto."
-        error.className = "error"
-        divNombre.insertAdjacentElement("afterend", error)
-        // se borra a los 5 segundos
-        setInterval(function () {error.remove()}, 5000)
+        mostrarError("Nombre incorrecto.", nombre)
     } 
 }
 
@@ -41,7 +35,7 @@ const errorNombre = (nombre) => {
 campoNombre.addEventListener("blur", function(e) {
     // recojo nombre
     let nombre = d.querySelector(".nombreApellidos")
-    if(!errorNombre(nombre.value)) {
+    if(!errorNombre(nombre)) {
         // no se envia el formulario
         e.preventDefault()
     }
@@ -61,15 +55,9 @@ const validarFecha = (fecha) => {
 
 // funcion error fecha
 const errorFecha = (fecha) => {
-    if(!validarFecha(fecha)) {
+    if(!validarFecha(fecha.value)) {
         // creo mensaje de error y lo meto debajo del div de fecha
-        const divFecha = d.querySelector(".divFecha")
-        const error = d.createElement("label")
-        error.textContent = "Fecha incorrecta."
-        error.className = "error"
-        divFecha.insertAdjacentElement("afterend", error)
-        // se borra a los 5 segundos
-        setInterval(function () {error.remove()}, 5000)
+        mostrarError("Fecha inválida.", fecha)
     }
 }
 
@@ -77,36 +65,62 @@ const errorFecha = (fecha) => {
 campoFecha.addEventListener("blur", function(e) {
     // recojo fecha
     let fecha = d.querySelector(".fecha")
-    if(!errorFecha(fecha.value)) {
+    if(!errorFecha(fecha)) {
         // no se envia el formulario
         e.preventDefault()
     }
 })
 
 // selecciono boton enviar
-const btnEnviar = d.querySelector(".enviar")
+const formulario = d.querySelector(".formulario")
 
-// evento enviar
-btnEnviar.addEventListener("click", function(e) {
+// funcion validar campos
+const validarCampos = () => {
     // recojo valores de todos los campos
     let nombre = d.querySelector(".nombreApellidos")
-    let longCorreo = d.querySelector(".correo").value.length
+    let correo = d.querySelector(".correo")
     let fecha = d.querySelector(".fecha")
-    let longMensaje = d.querySelector(".textarea").value.length
+    let listaSexo = d.querySelectorAll("[name]='sexo'")
+    let mensaje = d.querySelector(".textarea")
+
+    // compruebo si las listas están seleccionadas o no
+    
+
+    // variable para no enviar formulario si hay un error
+    let esOk = true
 
     // comprobar que todos los campos son válidos y no están vacíos
-    if(!errorNombre(nombre.value) || !errorFecha(fecha.value) || !errorMensaje(longMensaje) || !errorCorreo(longCorreo)) {
+    if(nombre.value == "") {
+        mostrarError("El campo de nombre está vacío.", nombre)
+        esOk = false
+    } else if (!validarNombre(nombre.value)) {
+        mostrarError("Nombre incorrecto.", nombre)
+        esOk = false
+    }
+
+    if(correo.value == "") {
+        mostrarError("El campo de correo está vacío.", correo)
+        esOk = false
+    }
+
+    if(fecha.value == "") {
+        mostrarError("El campo de fecha está vacío.", fecha)
+        esOk = false
+    } else if (!validarFecha(fecha.value)) {
+        mostrarError("Fecha incorrecta.", fecha)
+        esOk = false
+    }
+
+    if(sexo.value == "") {
+        mostrarError("El campo de sexo está vacío.", sexo)
+        esOk = false
+    }
+}
+
+// evento enviar formulario
+formulario.addEventListener("submit", function(e) {
+    if(!validarCampos()) {
         e.preventDefault()
-    }  
-    if(!validarCorreo(longCorreo)) {
-        // creo mensaje de error y lo meto debajo del div de fecha
-        const divCorreo = d.querySelector(".divCorreo")
-        const error = d.createElement("label")
-        error.textContent = "Correo vacío."
-        error.className = "error"
-        divCorreo.insertAdjacentElement("afterend", error)
-        // se borra a los 5 segundos
-        setInterval(function () {error.remove()}, 5000)
     }
 })
 
@@ -137,13 +151,7 @@ const errorMensaje = (mensaje) => {
 const errorCorreo = (longCorreo) => {
     if(!validarCorreo(longCorreo)) {
         // creo mensaje de error y lo meto debajo del div de fecha
-        const divCorreo = d.querySelector(".divCorreo")
-        const error = d.createElement("label")
-        error.textContent = "Correo vacío."
-        error.className = "error"
-        divCorreo.insertAdjacentElement("afterend", error)
-        // se borra a los 5 segundos
-        setInterval(function () {error.remove()}, 5000)
+        mostrarError("Correo vacío.", correo)
     }
 }
 
@@ -154,4 +162,14 @@ const validarCorreo = (longCorreo) => {
     } else {
         return true
     }
+}
+
+// mostrar error
+const mostrarError = (mensaje, elemento) => {
+    let error = d.createElement("p")
+    error.className = "error"
+    error.textContent= mensaje
+    elemento.insertAdjacentElement("afterend", error)
+
+    setTimeout(() => { error.remove() }, 3000)
 }
